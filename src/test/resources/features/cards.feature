@@ -10,6 +10,7 @@ Feature: Manage jokers
 
   Scenario: Delete a joker
     Given an existing card with name "Photograph" and description "First played face card gives X2 Mult when scored"
+    When the card is deleted
     Then the card no longer exists
 
   Scenario: Get non-existing joker
@@ -28,3 +29,8 @@ Feature: Manage jokers
   Scenario: Create joker with invalid body
     When I create a card with invalid payload
     Then the response status should be 500
+
+  Scenario: Create invalid joker
+    Given a card with name "" and description ""
+    Then the card is not created
+

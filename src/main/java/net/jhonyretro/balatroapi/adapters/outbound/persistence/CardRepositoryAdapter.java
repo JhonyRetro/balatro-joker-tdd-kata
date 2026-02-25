@@ -13,12 +13,10 @@ public class CardRepositoryAdapter implements CardRepositoryPort {
 
     private final JpaCardRepository jpaRepository;
     private final CardPersistenceMapper mapper;
-    private final CardService cardService;
 
-    public CardRepositoryAdapter(JpaCardRepository jpaRepository, CardPersistenceMapper mapper, CardService cardService) {
+    public CardRepositoryAdapter(JpaCardRepository jpaRepository, CardPersistenceMapper mapper) {
         this.jpaRepository = jpaRepository;
         this.mapper = mapper;
-        this.cardService = cardService;
     }
 
     @Override

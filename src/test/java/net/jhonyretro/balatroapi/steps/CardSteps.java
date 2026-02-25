@@ -28,6 +28,8 @@ public class CardSteps {
     @Given("a card with name {string} and description {string}")
     public void givenCard(String name, String description) {
         orderRequest = new HashMap<>();
+        assertThat(name).isNotNull();
+        assertThat(description).isNotNull();
         orderRequest.put("name", name);
         orderRequest.put("description", description);
     }
@@ -35,11 +37,12 @@ public class CardSteps {
     @Given("an existing card with name {string} and description {string}")
     public void givenExistingCard(String name, String description) {
         Map<String, Object> request = new HashMap<>();
+
         request.put("name", name);
         request.put("description", description);
 
         ResponseEntity<Map> createResponse =
-                restTemplate.postForEntity("/orders", request, Map.class);
+                restTemplate.postForEntity("/jokers", request, Map.class);
 
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(createResponse.getBody()).isNotNull();
@@ -52,7 +55,7 @@ public class CardSteps {
     @When("the card is saved")
     public void whenCardIsSaved() {
         ResponseEntity<Map> createResponse =
-                restTemplate.postForEntity("/orders", orderRequest, Map.class);
+                restTemplate.postForEntity("/jokers", orderRequest, Map.class);
 
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(createResponse.getBody()).isNotNull();
@@ -62,28 +65,28 @@ public class CardSteps {
 
     @When("the card is deleted")
     public void whenCardIsDeleted() {
-        restTemplate.delete("/orders/" + cardId);
+        restTemplate.delete("/jokers/" + cardId);
     }
 
     @When("I request a card with id {int}")
     public void whenRequestCardById(Integer id) {
-        response = restTemplate.getForEntity("/orders/{id}", String.class, id);
+        response = restTemplate.getForEntity("/jokers/{id}", String.class, id);
     }
 
     @When("I delete a card with id {int}")
     public void whenDeleteCardById(Integer id) {
-        restTemplate.delete("/orders/{id}", id);
-        response = restTemplate.getForEntity("/orders/{id}", String.class, id);
+        restTemplate.delete("/jokers/{id}", id);
+        response = restTemplate.getForEntity("/jokers/{id}", String.class, id);
     }
 
     @When("I request all cards")
     public void whenRequestAllCards() {
-        response = restTemplate.getForEntity("/orders", Object[].class);
+        response = restTemplate.getForEntity("/jokers", Object[].class);
     }
 
     @When("I create a card with invalid payload")
     public void whenCreateInvalidOrder() {
-        response = restTemplate.postForEntity("/orders", "invalid-json", String.class);
+        response = restTemplate.postForEntity("/jokers", "invalid-json", String.class);
     }
 
     // ---------- THEN ----------
@@ -91,7 +94,7 @@ public class CardSteps {
     @Then("the card is persisted successfully")
     public void thenCardPersistedSuccessfully() {
         ResponseEntity<Map> getResponse =
-                restTemplate.getForEntity("/orders/" + cardId, Map.class);
+                restTemplate.getForEntity("/jokers/" + cardId, Map.class);
 
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(getResponse.getBody()).isNotNull();
@@ -99,10 +102,15 @@ public class CardSteps {
                 .isEqualTo(cardId);
     }
 
+    @Then("the card is not created")
+    public void thenCardNotCreated() {
+        assertThat(cardId).isNull();
+    }
+
     @Then("the card no longer exists")
     public void thenCardNoLongerExists() {
         ResponseEntity<String> getResponse =
-                restTemplate.getForEntity("/orders/" + cardId, String.class);
+                restTemplate.getForEntity("/jokers/" + cardId, String.class);
 
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
@@ -110,10 +118,5 @@ public class CardSteps {
     @Then("the response status should be {int}")
     public void thenResponseStatusShouldBe(Integer status) {
         assertThat(response.getStatusCode().value()).isEqualTo(status);
-    }
-
-    @When("the card is saved")
-    public void theCardIsSaved() {
-        throw new PendingException();
     }
 }
